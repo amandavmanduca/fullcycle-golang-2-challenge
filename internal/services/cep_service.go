@@ -42,13 +42,19 @@ func (s *cepService) GetAddress(ctx context.Context, cep string) (*structs.Addre
 func (s *cepService) getAddressFromBrasilApi(ctx context.Context, cep string, c chan<- structs.AddressResponse) {
 	res, err := s.clients.BrasilApi.GetAddress(ctx, cep)
 	if err == nil {
-		c <- *res
+		select {
+		case c <- *res:
+		case <-ctx.Done():
+		}
 	}
 }
 
 func (s *cepService) getAddressFromViaCepApi(ctx context.Context, cep string, c chan<- structs.AddressResponse) {
 	res, err := s.clients.ViaCepApi.GetAddress(ctx, cep)
 	if err == nil {
-		c <- *res
+		select {
+		case c <- *res:
+		case <-ctx.Done():
+		}
 	}
 }
